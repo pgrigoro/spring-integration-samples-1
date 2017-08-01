@@ -49,9 +49,12 @@ public final class SampleSimple {
 				  + "\n                                                         "
 				  + "\n=========================================================" );
 
+//		@SuppressWarnings("resource")
+//		final AbstractApplicationContext context =
+//				new ClassPathXmlApplicationContext("classpath:META-INF/spring/integration/spring-integration-context.xml");
 		@SuppressWarnings("resource")
 		final AbstractApplicationContext context =
-				new ClassPathXmlApplicationContext("classpath:META-INF/spring/integration/spring-integration-context.xml");
+				new ClassPathXmlApplicationContext("classpath:META-INF/spring/integration/spring-integration-rabbitmq.xml");
 
 		context.registerShutdownHook();
 

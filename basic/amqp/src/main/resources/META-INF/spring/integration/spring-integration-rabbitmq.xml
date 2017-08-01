@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+       xmlns:task="http://www.springframework.org/schema/task" xmlns:beans="http://www.w3.org/2005/Atom"
+       xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- From STDIN To RabbitMQ -->
+
+    <int-stream:stdin-channel-adapter id="consoleIn"
+                                      channel="toRabbit">
+        <int:poller fixed-delay="1000" max-messages-per-poll="1"/>
+    </int-stream:stdin-channel-adapter>
+
+    <int:channel id="toRabbit"/>
+
+    <int-amqp:outbound-channel-adapter
+            channel="toRabbit" amqp-template="amqpTemplate" exchange-name="si.test.exchange"
+            routing-key="si.test.binding"/>
+
+    <!-- From RabbitMQ To STDOUT -->
+
+    <int-amqp:inbound-channel-adapter
+            channel="bad-channel"
+            queue-names="si.test.queue"
+            error-channel="error-channel"
+            connection-factory="connectionFactory"/>
+
+    <int:publish-subscribe-channel id="error-channel" task-executor="executor" error-handler="myErrorHandler"/>
+
+    <int:service-activator id="sa1" input-channel="error-channel" method="handleMessage1">
+        <bean class="org.springframework.integration.samples.amqp.MyServiceActivator"/>
+    </int:service-activator>
+
+
+    <int:service-activator id="sa2" input-channel="error-channel" method="handleMessage2">
+        <bean class="org.springframework.integration.samples.amqp.MyServiceActivator"/>
+    </int:service-activator>
+
+    <int:service-activator id="sa3" input-channel="error-channel" method="handleMessage3">
+        <bean class="org.springframework.integration.samples.amqp.MyServiceActivator"/>
+    </int:service-activator>
+
+
+    <int:bridge input-channel="error-channel" output-channel="to-error-queue-channel"/>
+
+    <int:channel id="to-error-queue-channel"/>
+
+
+    <int-amqp:outbound-channel-adapter
+            channel="to-error-queue-channel"
+            amqp-template="amqpTemplate"
+            exchange-name="si.test.error.exchange"
+            routing-key="si.test.error.binding"/>
+
+
+    <int:channel id="bad-channel"/>
+
+    <int:service-activator id="sa0" input-channel="bad-channel" method="causeError">
+        <bean class="org.springframework.integration.samples.amqp.MyServiceActivator"/>
+    </int:service-activator>
+
+
+    <task:executor id="executor" pool-size="10"/>
+
+
+    <bean id="myErrorHandler" class="org.springframework.integration.samples.amqp.MyErrorHandler"/>
+
+    <!-- Infrastructure -->
+
+    <rabbit:connection-factory id="connectionFactory" host="localhost"/>
+
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory"/>
+
+    <rabbit:admin connection-factory="connectionFactory"/>
+
+    <rabbit:queue name="si.test.queue"/>
+    <rabbit:direct-exchange name="si.test.exchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="si.test.queue" key="si.test.binding"/>
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+
+
+    <rabbit:queue name="si.test.error.queue">
+        <rabbit:queue-arguments value-type="java.lang.Long">
+            <entry key="x-message-ttl" value="30000" />
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+    <rabbit:direct-exchange name="si.test.error.exchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="si.test.error.queue" key="si.test.error.binding"/>
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+
+</beans>
