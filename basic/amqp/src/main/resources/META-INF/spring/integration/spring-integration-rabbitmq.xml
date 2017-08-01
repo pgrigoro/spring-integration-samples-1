@@ -31,26 +31,24 @@
     <int-amqp:inbound-channel-adapter
             channel="bad-channel"
             queue-names="si.test.queue"
-            error-channel="error-channel"
+            error-channel="errorChannel"
             connection-factory="connectionFactory"/>
 
-    <int:publish-subscribe-channel id="error-channel" task-executor="executor" error-handler="myErrorHandler"/>
-
-    <int:service-activator id="sa1" input-channel="error-channel" method="handleMessage1">
+    <int:service-activator id="sa1" input-channel="errorChannel" method="handleMessage1">
         <bean class="org.springframework.integration.samples.amqp.MyServiceActivator"/>
     </int:service-activator>
 
 
-    <int:service-activator id="sa2" input-channel="error-channel" method="handleMessage2">
+    <int:service-activator id="sa2" input-channel="errorChannel" method="handleMessage2">
         <bean class="org.springframework.integration.samples.amqp.MyServiceActivator"/>
     </int:service-activator>
 
-    <int:service-activator id="sa3" input-channel="error-channel" method="handleMessage3">
+    <int:service-activator id="sa3" input-channel="errorChannel" method="handleMessage3">
         <bean class="org.springframework.integration.samples.amqp.MyServiceActivator"/>
     </int:service-activator>
 
 
-    <int:bridge input-channel="error-channel" output-channel="to-error-queue-channel"/>
+    <int:bridge input-channel="errorChannel" output-channel="to-error-queue-channel"/>
 
     <int:channel id="to-error-queue-channel"/>
 
