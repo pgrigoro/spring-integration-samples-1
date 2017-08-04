@@ -26,7 +26,7 @@ import org.springframework.integration.xml.source.DomSourceFactory;
 public class SimpleEchoResponder {
 
 	public Source issueResponseFor(DOMSource request) throws InterruptedException {
-//		System.out.println("Started processing a request");
+		System.out.println(Thread.currentThread().getId() + " - Started processing a request");
 //		Thread.sleep(4000);
 //		System.out.println("Woke up from sleep in the Request Processor");
 		throw new RuntimeException("SOME ERROR");
