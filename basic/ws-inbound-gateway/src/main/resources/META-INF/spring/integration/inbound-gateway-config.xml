@@ -13,7 +13,7 @@
 	<int-ws:inbound-gateway id="ws-inbound-gateway" request-channel="input" error-channel="my-own-error-handler"/>
 
 
-	<int:publish-subscribe-channel id="my-own-error-handler" task-executor="executor"/>
+	<int:publish-subscribe-channel id="my-own-error-handler"/>
 
 	<int:service-activator input-channel="input">
 		<bean class="org.springframework.integration.samples.ws.SimpleEchoResponder"/>
@@ -22,7 +22,4 @@
 	<int:service-activator input-channel="my-own-error-handler">
 		<bean class="org.springframework.integration.samples.ws.ErrorHandler"/>
 	</int:service-activator>
-
-	<task:executor id="executor" pool-size="10"/>
-
 </beans>
