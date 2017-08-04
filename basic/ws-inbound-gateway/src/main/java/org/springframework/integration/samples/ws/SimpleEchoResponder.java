@@ -26,8 +26,9 @@ import org.springframework.integration.xml.source.DomSourceFactory;
 public class SimpleEchoResponder {
 
 	public Source issueResponseFor(DOMSource request) {
-		return new DomSourceFactory().createSource(
-				"<echoResponse xmlns=\"http://www.springframework.org/spring-ws/samples/echo\">" +
-				request.getNode().getTextContent() + "</echoResponse>");
+		throw new RuntimeException("SOME ERROR");
+//		return new DomSourceFactory().createSource(
+//				"<echoResponse xmlns=\"http://www.springframework.org/spring-ws/samples/echo\">" +
+//						request.getNode().getTextContent() + "</echoResponse>");
 	}
 }

@@ -78,9 +78,12 @@ public class InboundGatewayTests {
 		MessageContext messageContext = new DefaultMessageContext(request, messageFactory);
 		gateway.invoke(messageContext);
 		Object reply = messageContext.getResponse().getPayloadSource();
+
 		assertThat(reply, is(instanceOf(DOMSource.class)));
 		DOMSource replySource = (DOMSource) reply;
 		Element element = (Element) replySource.getNode().getFirstChild();
 		assertThat(element.getTagName(), equalTo("echoResponse"));
+
+		System.out.println("RESP= " + element.getTextContent());
 	}
 }

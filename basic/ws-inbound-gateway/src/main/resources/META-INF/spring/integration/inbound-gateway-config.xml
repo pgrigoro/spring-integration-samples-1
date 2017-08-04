@@ -8,11 +8,15 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<int:channel id="input"/>
-	
-	<int-ws:inbound-gateway id="ws-inbound-gateway" request-channel="input"/>
+
+	<int-ws:inbound-gateway id="ws-inbound-gateway" request-channel="input" error-channel="errorChannel"/>
 	
 	<int:service-activator input-channel="input">
 		<bean class="org.springframework.integration.samples.ws.SimpleEchoResponder"/>
 	</int:service-activator>
-	
+
+	<int:service-activator input-channel="errorChannel">
+		<bean class="org.springframework.integration.samples.ws.ErrorHandler"/>
+	</int:service-activator>
+
 </beans>
