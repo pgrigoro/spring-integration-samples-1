@@ -3,20 +3,26 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:int="http://www.springframework.org/schema/integration"
 	xmlns:int-ws="http://www.springframework.org/schema/integration/ws"
-	xsi:schemaLocation="http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
+	   xmlns:task="http://www.springframework.org/schema/task"
+	   xsi:schemaLocation="http://www.springframework.org/schema/integration/ws http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
 		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<int:channel id="input"/>
+	<int-ws:inbound-gateway id="ws-inbound-gateway" request-channel="input" error-channel="my-own-error-handler"/>
 
-	<int-ws:inbound-gateway id="ws-inbound-gateway" request-channel="input" error-channel="errorChannel"/>
-	
+
+	<int:publish-subscribe-channel id="my-own-error-handler" task-executor="executor"/>
+
 	<int:service-activator input-channel="input">
 		<bean class="org.springframework.integration.samples.ws.SimpleEchoResponder"/>
 	</int:service-activator>
 
-	<int:service-activator input-channel="errorChannel">
+	<int:service-activator input-channel="my-own-error-handler">
 		<bean class="org.springframework.integration.samples.ws.ErrorHandler"/>
 	</int:service-activator>
+
+	<task:executor id="executor" pool-size="10"/>
 
 </beans>

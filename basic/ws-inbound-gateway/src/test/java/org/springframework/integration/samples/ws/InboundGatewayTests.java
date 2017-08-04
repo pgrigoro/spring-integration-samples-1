@@ -22,12 +22,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.StringReader;
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
@@ -79,11 +81,23 @@ public class InboundGatewayTests {
 		gateway.invoke(messageContext);
 		Object reply = messageContext.getResponse().getPayloadSource();
 
+
 		assertThat(reply, is(instanceOf(DOMSource.class)));
 		DOMSource replySource = (DOMSource) reply;
+
+		System.out.printf("REPLY= %s%n", toString(replySource));
+
 		Element element = (Element) replySource.getNode().getFirstChild();
 		assertThat(element.getTagName(), equalTo("echoResponse"));
 
 		System.out.println("RESP= " + element.getTextContent());
+	}
+
+	private String toString(DOMSource domSource) throws Exception{
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		StringWriter sw = new StringWriter();
+		StreamResult sr = new StreamResult(sw);
+		transformer.transform(domSource, sr);
+		return sw.toString();
 	}
 }

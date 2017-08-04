@@ -25,10 +25,10 @@ import org.springframework.integration.xml.source.DomSourceFactory;
  */
 public class SimpleEchoResponder {
 
-	public Source issueResponseFor(DOMSource request) {
+	public Source issueResponseFor(DOMSource request) throws InterruptedException {
+//		System.out.println("Started processing a request");
+//		Thread.sleep(4000);
+//		System.out.println("Woke up from sleep in the Request Processor");
 		throw new RuntimeException("SOME ERROR");
-//		return new DomSourceFactory().createSource(
-//				"<echoResponse xmlns=\"http://www.springframework.org/spring-ws/samples/echo\">" +
-//						request.getNode().getTextContent() + "</echoResponse>");
 	}
 }
