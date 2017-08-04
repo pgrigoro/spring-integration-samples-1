@@ -10,19 +10,18 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<int:channel id="input"/>
-	<int-ws:inbound-gateway id="ws-inbound-gateway" request-channel="input" error-channel="my-own-error-handler"/>
-
-
-	<int:publish-subscribe-channel id="my-own-error-handler" task-executor="executor"/>
+	<int-ws:inbound-gateway id="ws-inbound-gateway" request-channel="input" error-channel="errorChannel"/>
 
 	<int:service-activator input-channel="input">
 		<bean class="org.springframework.integration.samples.ws.SimpleEchoResponder"/>
 	</int:service-activator>
 
-	<int:service-activator input-channel="my-own-error-handler">
+	<int:service-activator input-channel="errorChannel">
 		<bean class="org.springframework.integration.samples.ws.ErrorHandler"/>
 	</int:service-activator>
 
+
+	<int:publish-subscribe-channel id="my-own-error-handler" task-executor="executor"/>
 	<task:executor id="executor" pool-size="10"/>
 
 </beans>
